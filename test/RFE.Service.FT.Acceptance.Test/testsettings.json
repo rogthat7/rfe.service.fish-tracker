@@ -1,0 +1,67 @@
+{  
+  "Serilog": {
+    "Using": ["IAZI.Common.Infrastructure"],
+    "MinimumLevel": {
+      "Default": "Debug",
+      "Override": {
+        "Microsoft": "Warning",
+        "System": "Warning",
+        "Microsoft.AspNetCore.Authentication": "Information"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "CustomConsole",
+        "Args": {
+          "theme": "IAZI.Serilog.Sinks.SystemConsole.Themes.ConsoleTheme::None, IAZI.Common.Infrastructure",
+          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}¬env=\"{Environment}\"¬logsource=\"{MachineName}\"¬loglevel=\"{Level}\"¬trk=\"{Tracking}\"¬requestip=\"{RequestIp:l}\"¬requestid=\"{RequestId:l}\"¬operationid=\"{OperationId:l}\"¬parentid=\"{ParentId:l}\"¬requestpath=\"{RequestPath:l}\"¬correlationid=\"{Correlationid:l}\"¬userid=\"{UserId:l}\"¬username=\"{UserName:l}\"¬context=\"{SourceContext}\"‖{Message:lj}{Exception:l}‖{NewLine}"
+        }
+      }
+    ],
+    "Enrich": [
+      "FromLogContext",
+      "WithMachineName",
+      "WithEnvironmentLogging",
+      "WithOperationId"
+    ]
+  },
+  "ServiceConfiguration": {        
+    "Data": {
+      "EnableRedisCache": false,
+      "ConnectionStrings": {
+        "DefaultConnection": "Server=database;Database=TEMPLATE_DEV;User ID=dbs_Template;Password=xxx;ConnectRetryCount=5;"
+      }
+    },
+    "Security": {
+      "ApiName": "IAZI.Service.TestClient",
+      "ApiSecret": "secret",
+      "Certificate": {
+        "UsedCertMode": "None"
+      }
+    },
+    "Interfaces": {
+      "Service.Auth.IdentityServer": {
+        "Name": "IAZI.Service.Auth.IdentityServer",
+        "BaseUrl": "https://dev.iazi.ch/api/auth"        
+      },   
+      "Web.AppPortal": {
+        "Name": "IAZI.Web.AppPortal",
+        "BaseUrl": "https://devmy.iazi.ch"
+      },   
+      "Service.Template": {
+        "Name": "RFE.Service.FT",
+        "BaseUrl": "https://dev.iazi.ch/api/template",
+        "GrantType": "Delegation"
+      }      
+    },
+    "Custom": {      
+      "Test": {
+        "ChromeDriver": {
+          "HideBrowser": false
+        },
+        "UserName": "<user>",
+        "UserNamePassword": "<password>"
+      }
+    }    
+  }
+}

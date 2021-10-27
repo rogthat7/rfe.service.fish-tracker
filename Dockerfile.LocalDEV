@@ -1,0 +1,25 @@
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-bionic AS base
+
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-bionic as build
+WORKDIR /src
+COPY ./src .
+
+WORKDIR /src/RFE.Service.FT.Web
+#Prepare ASP.NET Core Web App
+COPY /NuGet.Config ./
+RUN dotnet restore --configfile ./NuGet.Config -nowarn:msb3202,nu1503
+RUN dotnet publish --no-restore -c Release -o /app
+#Cleanup of Published content
+RUN rm -rf '/app/*.pdb'
+
+FROM base AS final
+COPY --from=build /app .
+EXPOSE 80
+ENV ASPNETCORE_URLS=http://*:80
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENTRYPOINT ["dotnet", "RFE.Service.FT.Web.dll"]
+
+#docker build --pull --rm -f "Dockerfile" -t docker-registry.iazi.local:30002/library/service.ft:0.1 -t docker-registry.iazi.local:30641/iazi/service.ft:latest .
+#docker run -p 9001:80 --rm --name service.ft docker-registry.iazi.local:30002/library/service.ft:latest
+#docker push docker-registry.iazi.local:30002/library/service.ft:latest
+#docker push docker-registry.iazi.local:30002/library/iazi/service.ft:0.1
